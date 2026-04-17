@@ -1,0 +1,49 @@
+---
+title: "final_project_code"
+author: "Angelina A., Heonmi K., Caroline S., and Zilin W."
+date: "Spring 2026"
+output: html_document
+---
+
+```{r, include = F}
+library("readxl") 
+# May need to install.packages("readxl")
+```
+
+
+Reading in the data
+
+```{r}
+read_data <- read_excel("./stat571B_reading_data.xlsx")
+
+read_data['total_time'] = read_data['Time (minutes)']*60 + read_data['Time (seconds)']
+
+read_data['format'] = c("Laptop", "Laptop", "Print", 
+                        "Laptop", "Print", "Print",
+                        "Print", "Print", "Laptop", 
+                        "Print", "Laptop", "Laptop",
+                        "Laptop", "Print", "Print", 
+                        "Laptop", "Print", "Laptop",
+                        "Print", "Laptop", "Laptop",
+                        "Print", "Laptop", "Print",
+                        "Laptop", "Print", "Laptop",
+                        "Laptop", "Laptop", "Print",
+                        "Print", "Laptop", "Print",
+                        "Print", "Print", "Laptop")
+
+read_data["music"] = c("no", "yes", "no", 
+                       "yes", "no", "yes", 
+                       "no", "yes", "no", 
+                       "yes", "no", "yes", 
+                       "no", "no", "yes",
+                       "yes", "yes", "no", 
+                       "no", "no", "yes", 
+                       "yes", "yes", "no", 
+                       "no", "yes", "yes",
+                       "yes", "no", "no",
+                       "no", "yes", "yes",
+                       "yes", "no", "no")
+                
+read_data
+```
+
