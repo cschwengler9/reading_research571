@@ -2,7 +2,9 @@
 title: "final_project_code"
 author: "Angelina A., Heonmi K., Caroline S., and Zilin W."
 date: "Spring 2026"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r, include = F}
@@ -11,7 +13,7 @@ library("readxl")
 ```
 
 
-Reading in the data
+## 1. Reading in the data
 
 ```{r}
 read_data <- read_excel("./stat571B_reading_data.xlsx")
@@ -47,3 +49,59 @@ read_data["music"] = c("no", "yes", "no",
 read_data
 ```
 
+
+## 2. Analysis
+
+We used ANOVA with participant as a blocking factor as required. Additionally, a linear mixed-effects model with participant as a random effect was fitted to account for within-subject correlation, yielding consistent results.
+
+```{r include=FALSE}
+# format
+read_data$format <- factor(read_data$format)
+read_data$music  <- factor(read_data$music)
+read_data$Participant <- factor(read_data$Participant)
+
+# library
+library(car)
+library(lme4)
+library(lmerTest)  
+```
+
+### Model 1: Time
+
+```{r}
+# ANOVA for Reading Time
+model_time <- lm(total_time ~ format + music + format:music + Participant, data = read_data)
+Anova(model_time, type = "III")
+
+## Mixed Effects Model (Supplementary Analysis)
+lmer_time <- lmer(total_time ~ format * music + (1 | Participant), data = read_data)
+anova(lmer_time)
+```
+
+For reading time, neither format nor the interaction between format and music was significant. Music showed a marginal effect in the ANOVA model and was significant in the mixed-effects model, suggesting a potential influence of music on reading time after accounting for within-subject variability.
+
+### Model 2: Comprehension
+
+```{r}
+# ANOVA for Comprehension
+model_comp <- lm(`Comprehension score (%)` ~ format + music + format:music + Participant, data = read_data)
+Anova(model_comp, type = "III")
+
+## Mixed Effects Model (Supplementary Analysis)
+lmer_comp <- lmer(`Comprehension score (%)` ~ format * music + (1 | Participant), data = read_data)
+anova(lmer_comp)
+```
+
+For comprehension, the interaction between format and music was statistically significant, indicating that the effect of format depends on the presence of music. Neither main effect was significant on its own.
+
+### Diagnostics for ANOVA
+
+```{r}
+par(mfrow = c(2,2))
+plot(model_time)
+
+par(mfrow = c(2,2))
+plot(model_comp)
+```
+
+Diagnostic plots indicate no major violations of model assumptions.
