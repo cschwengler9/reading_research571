@@ -3,8 +3,8 @@ title: "final_project_code"
 author: "Angelina A., Heonmi K., Caroline S., and Zilin W."
 date: "Spring 2026"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r, include = F}
@@ -52,11 +52,14 @@ read_data
 
 ## 2. Analysis
 
-We used ANOVA with participant as a blocking factor as required. Additionally, a linear mixed-effects model with participant as a random effect was fitted to account for within-subject correlation, yielding consistent results.
+We used ANOVA with participant as a blocking factor to assess the significance of the experimental factors, as required. Additionally, linear mixed-effects models were fitted with participant as a random effect to account for within-subject correlation.
+
+We fit factorial models with format, music, and their interaction as primary fixed effects. Because participants each read multiple passages, participant was included to account for within-subject variability. Since only three text passages were used, Text was included as a fixed effect rather than a random effect to adjust for possible passage-specific differences.
 
 ```{r include=FALSE}
 # format
 read_data$format <- factor(read_data$format)
+read_data$Text <- factor(read_data$Text)
 read_data$music  <- factor(read_data$music)
 read_data$Participant <- factor(read_data$Participant)
 
@@ -70,29 +73,31 @@ library(lmerTest)
 
 ```{r}
 # ANOVA for Reading Time
-model_time <- lm(total_time ~ format + music + format:music + Participant, data = read_data)
+model_time <- lm(total_time ~ format * music + Text + Participant, data = read_data)
 Anova(model_time, type = "III")
 
 ## Mixed Effects Model (Supplementary Analysis)
-lmer_time <- lmer(total_time ~ format * music + (1 | Participant), data = read_data)
+lmer_time <- lmer(total_time ~ format * music + Text + (1 | Participant), data = read_data)
 anova(lmer_time)
 ```
 
-For reading time, neither format nor the interaction between format and music was significant. Music showed a marginal effect in the ANOVA model and was significant in the mixed-effects model, suggesting a potential influence of music on reading time after accounting for within-subject variability.
+For reading time, neither format nor the interaction between format and music was statistically significant. Music showed a marginal effect in the ANOVA model and was statistically significant in the mixed-effects model, suggesting a potential influence of music on reading time after accounting for within-subject variability.
+The effect of Text was not statistically significant, indicating no strong evidence of differences in reading time across the three passages.
 
 ### Model 2: Comprehension
 
 ```{r}
 # ANOVA for Comprehension
-model_comp <- lm(`Comprehension score (%)` ~ format + music + format:music + Participant, data = read_data)
+model_comp <- lm(`Comprehension score (%)` ~ format * music + Text + Participant, data = read_data)
 Anova(model_comp, type = "III")
 
 ## Mixed Effects Model (Supplementary Analysis)
-lmer_comp <- lmer(`Comprehension score (%)` ~ format * music + (1 | Participant), data = read_data)
+lmer_comp <- lmer(`Comprehension score (%)` ~ format * music + Text + (1 | Participant), data = read_data)
 anova(lmer_comp)
 ```
 
-For comprehension, the interaction between format and music was statistically significant, indicating that the effect of format depends on the presence of music. Neither main effect was significant on its own.
+For comprehension, the interaction between format and music was statistically significant in the ANOVA model and marginally significant in the mixed-effects model. This indicates that the effect of format on comprehension depends on the presence of music, and therefore the main effects of format and music should not be interpreted independently.
+The main effects of format and music were not statistically significant on their own. The effect of Text was also not statistically significant, suggesting no strong evidence of differences in comprehension across passages.
 
 ### Diagnostics for ANOVA
 
@@ -104,4 +109,4 @@ par(mfrow = c(2,2))
 plot(model_comp)
 ```
 
-Diagnostic plots indicate no major violations of model assumptions.
+Diagnostic plots for both models indicate no major violations of model assumptions.
