@@ -73,31 +73,42 @@ library(lmerTest)
 
 ```{r}
 # ANOVA for Reading Time
-model_time <- lm(total_time ~ format * music + Text + Participant, data = read_data)
+model_time <- lm(total_time ~ format * music + Text + Participant + Participant:music, 
+                 data = read_data)
 Anova(model_time, type = "III")
 
-## Mixed Effects Model (Supplementary Analysis)
-lmer_time <- lmer(total_time ~ format * music + Text + (1 | Participant), data = read_data)
-anova(lmer_time)
+## Mixed Effects Model 
+model_time_lmer <- lmer(
+  total_time ~ format * music +
+    (1 | Text) +
+    (1 + music | Participant),
+  data = read_data
+)
+anova(model_time_lmer)
 ```
 
-For reading time, neither format nor the interaction between format and music was statistically significant. Music showed a marginal effect in the ANOVA model and was statistically significant in the mixed-effects model, suggesting a potential influence of music on reading time after accounting for within-subject variability.
-The effect of Text was not statistically significant, indicating no strong evidence of differences in reading time across the three passages.
+
 
 ### Model 2: Comprehension
 
 ```{r}
 # ANOVA for Comprehension
-model_comp <- lm(`Comprehension score (%)` ~ format * music + Text + Participant, data = read_data)
+model_comp <- lm(`Comprehension score (%)` ~ format * music + Text + 
+                   Participant + Participant:music, 
+                  data = read_data)
 Anova(model_comp, type = "III")
 
-## Mixed Effects Model (Supplementary Analysis)
-lmer_comp <- lmer(`Comprehension score (%)` ~ format * music + Text + (1 | Participant), data = read_data)
-anova(lmer_comp)
+## Mixed Effects Model 
+model_comp_lmer <- lmer(
+  `Comprehension score (%)` ~ format * music +
+    (1 | Text) +
+    (1 + music | Participant),
+  data = read_data
+)
+anova(model_comp_lmer)
 ```
 
-For comprehension, the interaction between format and music was statistically significant in the ANOVA model and marginally significant in the mixed-effects model. This indicates that the effect of format on comprehension depends on the presence of music, and therefore the main effects of format and music should not be interpreted independently.
-The main effects of format and music were not statistically significant on their own. The effect of Text was also not statistically significant, suggesting no strong evidence of differences in comprehension across passages.
+
 
 ### Diagnostics for ANOVA
 
@@ -109,4 +120,3 @@ par(mfrow = c(2,2))
 plot(model_comp)
 ```
 
-Diagnostic plots for both models indicate no major violations of model assumptions.
