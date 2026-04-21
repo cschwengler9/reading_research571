@@ -52,10 +52,6 @@ read_data
 
 ## 2. Analysis
 
-We used ANOVA with participant as a blocking factor to assess the significance of the experimental factors, as required. Additionally, linear mixed-effects models were fitted with participant as a random effect to account for within-subject correlation.
-
-We fit factorial models with format, music, and their interaction as primary fixed effects. Because participants each read multiple passages, participant was included to account for within-subject variability. Since only three text passages were used, Text was included as a fixed effect rather than a random effect to adjust for possible passage-specific differences.
-
 ```{r include=FALSE}
 # format
 read_data$format <- factor(read_data$format)
@@ -86,7 +82,6 @@ model_time_lmer <- lmer(
 )
 anova(model_time_lmer)
 ```
-
 
 
 ### Model 2: Comprehension
