@@ -8,6 +8,9 @@ output:
 ---
 
 ```{r, include = F}
+library(car)
+library(lme4)
+library(lmerTest)  
 library("readxl") 
 # May need to install.packages("readxl")
 ```
@@ -58,11 +61,6 @@ read_data$format <- factor(read_data$format)
 read_data$Text <- factor(read_data$Text)
 read_data$music  <- factor(read_data$music)
 read_data$Participant <- factor(read_data$Participant)
-
-# library
-library(car)
-library(lme4)
-library(lmerTest)  
 ```
 
 ### Model 1: Time
@@ -103,7 +101,24 @@ model_comp_lmer <- lmer(
 anova(model_comp_lmer)
 ```
 
+Since the comprehension model does not lead to very interesting analysis of results (likely because there was not very much variance within these scores), we have decided to fit another model treating it as a fixed effect in order to determine if it had any effect on reading time. We would expect that lower reading time would be correlated with lower reading time. We must acknowledge however, that this is not a causal realtionship but can be indicative of a relationship between these variables.
 
+```{r}
+model_time_lmer <- lmer(
+  total_time ~ format * music * `Comprehension score (%)` + 
+    (1 | Text) +
+    (1 + music | Participant),
+  data = read_data
+)
+
+anova(model_time_lmer)
+```
+
+```{r}
+cor(read_data$total_time, read_data$`Comprehension score (%)`)
+```
+
+Nothing significant in the model. Comprehension is not a significant predictor dispite being negatively correlated with reading time.
 
 ### Diagnostics for ANOVA
 
