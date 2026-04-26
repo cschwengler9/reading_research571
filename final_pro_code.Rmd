@@ -1,6 +1,6 @@
 ---
-title: "final_project_code"
-author: "Angelina A., Heonmi K., Caroline S., and Zilin W."
+title: "Analysis of Reading Skill and Contributing Factors"
+authors: "Angelina A., Heonmi K., Caroline S., and Zilin W."
 date: "Spring 2026"
 output:
   pdf_document: default
@@ -12,11 +12,29 @@ library(car)
 library(lme4)
 library(lmerTest)  
 library("readxl") 
+library(dplyr)
+library(ggplot2)
 # May need to install.packages("readxl")
 ```
 
+## Abstract (add to once we get conclusions)
 
-## 1. Reading in the data
+This research project sought to identify which factors have a significant impact on reading outcomes such as comprehension and reading speed. As a result we hoped to determine how one might best be able to improve their reading ability. We specifically analyzed the impact that the format of the text and the presence of music had on our reading outcomes. To address these questions we formulated a balanced, incomplete, factorial, Latin square design. We then fit both mixed and fixed effects models who were examined using analysis of variance methods. 
+TODO from this point on
+
+## Introduction
+
+Reading is something that most people do every single day whether it is for enjoyment or an assigned reading
+for work or school. We were interested in finding how someone might best be able to improve their reading ability (measured
+by both speed and comprehension). We are also interested if some factors have a greater impact on one of these impacts than on the other. We decided to study the format in which a text is read (either printed on paper or digitally on a laptop) and whether the participant was listening to music as they read. Nowadays digital work is becoming work common and it would be interesting to examine the impact that this has on reading ability. We also decided to include music as a factor because many people choose to listen to music as they work and our results may be generalizable to any sort of background music. In order to analyze our data, we fit mixed effects models and used analysis of variance procedures these were selected as a result of the experimental design and also because we wanted to include random effects in our models. we studied two separate response variables, fitting models for each of them because we believed them to be equally important and impossible to study separately. These response variables were the total reading time in seconds as well as the comprehension of the text (measured by the percentage score obtained on a four question quiz after reading). We predict that faster reading times may be associated with lower comprehension, which also influenced our decision to study both responses. 
+
+## Experimental Design
+
+In order to analyse our main research questions we formulated an experiment with a balanced, incomplete, factorial, Latin square design. We recruited twelve participants who each read three selected texts in a random order with random treatment levels selected. We only had three texts of similar length of difficulty available for this study. Due to this limitation and because seeing a text more than once would directly impact reading speed and comprehension we needed to use an incomplete design. We studied two factors with two levels each and blocked based on both the text read as well as the participant who was reading. Recruiting tweleve participants allowed us to obtain a greater sample size and record three repeated measurements which increases the sample size and improves the power of our tests.
+
+## Statistical Analyses
+
+### Reading in the data
 
 ```{r}
 read_data <- read_excel("./stat571B_reading_data.xlsx")
@@ -53,7 +71,7 @@ read_data
 ```
 
 
-## 2. Analysis
+### Analysis
 
 ```{r include=FALSE}
 # format
@@ -63,7 +81,7 @@ read_data$music  <- factor(read_data$music)
 read_data$Participant <- factor(read_data$Participant)
 ```
 
-### Model 1: Time
+#### Model 1: Time
 
 First we fitted a full factorial linear model including format, music, text, and participant as fixed effect to explore the overall patterns in the data. An ANOVA was created and provided a significant main effect of music (p=0.04867), text (p=0.02744), and participants (p=0.01437). This is something we expected before analyzing. Also, we saw that no interaction effects were significant.
 
@@ -107,7 +125,7 @@ ggplot(avg_time_text_music, aes(x = Text, y = avg_time, fill = factor(music))) +
   theme_minimal()
 ```
 
-### Model 2: Comprehension
+#### Model 2: Comprehension
 
 First we fitted a full factorial linear model including format, music, text, and participant as fixed effect to explore the overall patterns in the data. An ANOVA was created and provided no significant effect on comprehension for any main effect. 
 We believe this is due to the lack of variance in our comprehensions scores. 
@@ -179,7 +197,7 @@ ggplot(read_data, aes(x = total_time, y = `Comprehension score (%)`)) +
 
 From this analysis, we can conclude that there was insufficient evidence to detect a significant effect on reading comprehension. However, we did find that music has an significant effect on total reading time. With more time for data collection and a larger sample size, it would be interesting to investigate whether additional factors influence these responses or whether stronger effects emerge. Overall, this model gives a great starting point for further exploration of these relationships and could lead to more interesting findings.
 
-### Diagnostics for ANOVA
+#### Diagnostics for ANOVA
 
 ```{r}
 par(mfrow = c(2,2))
@@ -188,4 +206,9 @@ plot(model_time)
 par(mfrow = c(2,2))
 plot(model_comp)
 ```
+
+
+
+### Conclusions
+
 
