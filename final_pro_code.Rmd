@@ -205,8 +205,47 @@ plot(model_time)
 
 par(mfrow = c(2,2))
 plot(model_comp)
+
 ```
 
+## Diagnostics for mixed-effects models
+
+```{r}
+isSingular(model_time_lmer)
+isSingular(model_comp_lmer)
+
+# Residual diagnostics: reading time mixed model
+
+plot(fitted(model_time_lmer), resid(model_time_lmer),
+     xlab="Fitted values",
+     ylab="Residuals",
+     main="Residuals vs Fitted (Time Model)")
+abline(h=0,col="red")
+
+qqnorm(resid(model_time_lmer))
+qqline(resid(model_time_lmer), col="red")
+
+# Residual diagnostics: comprehension mixed model
+
+plot(fitted(model_comp_lmer), resid(model_comp_lmer),
+     xlab="Fitted values",
+     ylab="Residuals",
+     main="Residuals vs Fitted (Comprehension Model)")
+abline(h=0,col="red")
+
+qqnorm(resid(model_comp_lmer))
+qqline(resid(model_comp_lmer), col="red")
+```
+
+The diagnostic plots were used to assess model assumptions.
+
+For the reading time model, the residuals versus fitted plot does not show a strong systematic pattern, suggesting that the assumption of constant variance is reasonable. The Q-Q plot indicates approximate normality of residuals with only minor deviations in the tails.
+
+For the comprehension score model, the residual plots show slightly more limitation because the response variable takes only a small number of discrete values. However, no strong violation of modeling assumptions is observed.
+
+The mixed-effects models produced singular fit warnings, indicating that at least one random-effect variance component is estimated close to zero. This suggests that the participant-specific slope for music contributes little additional variability beyond the intercept-only random effect. However, the mixed-effects structure was retained to reflect the experimental design.
+
+Overall, diagnostics suggest that the reading time model is appropriate for inference, while the comprehension model should be interpreted more cautiously due to limited response variability.
 
 
 ### Conclusions
