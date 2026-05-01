@@ -7,13 +7,15 @@ output:
   html_document: default
 ---
 
-```{r, include = F}
+```{r, include = F, echo=TRUE}
 library(car)
 library(lme4)
 library(lmerTest)  
 library("readxl") 
 library(dplyr)
 library(ggplot2)
+library(knitr)
+library(kableExtra)
 # May need to install.packages("readxl")
 ```
 
@@ -34,9 +36,7 @@ In order to analyse our main research questions we formulated an experiment with
 
 ## Statistical Analyses
 
-### Reading in the data
-
-```{r}
+```{r, include=FALSE, warning= FALSE, message= FALSE}
 read_data <- read_excel("./stat571B_reading_data.xlsx")
 
 read_data['total_time'] = read_data['Time (minutes)']*60 + read_data['Time (seconds)']
@@ -71,9 +71,7 @@ read_data
 ```
 
 
-### Analysis
-
-```{r include=FALSE}
+```{r include=FALSE, warning= FALSE, message= FALSE}
 # format
 read_data$format <- factor(read_data$format)
 read_data$Text <- factor(read_data$Text)
@@ -81,15 +79,30 @@ read_data$music  <- factor(read_data$music)
 read_data$Participant <- factor(read_data$Participant)
 ```
 
-#### Model 1: Time
+### Model 1: Time
+
 
 First we fitted a full factorial linear model including format, music, text, and participant as fixed effect to explore the overall patterns in the data. An ANOVA was created and provided a significant main effect of music (p=0.04867), text (p=0.02744), and participants (p=0.01437). This is something we expected before analyzing. Also, we saw that no interaction effects were significant.
 
 However, because participants and text represent a random sample, we then fitted a mixed-effects model treating participants and text as our random effects. We also wanted to explore participant specific random slope for music. Changing our model to this allows for results to be generalized beyond our specific data collection.
 
-From the ANOVA of this model, we concluded that music was the only statistically significant main effect with a p-value of  0.0112. Displayed below is a bar plot showing the effect of music on reading time. We see that for all text reading time increased with music usage. 
+# Write model here:
 
-```{r}
+From the ANOVA of this model, we concluded that music was the only statistically significant main effect with a p-value of  0.0112. There is no significant effect of the interaction term between format and music. Also, looking at the RANOVA p-values for our random effect factors we concluded that the random effect for text showed no evidence of variance between the 3 text. Additionally, the random effect of music by participant showed no evidence of variance between how music effects the reader. This shows that participants are fairly consistent and text does not explain much variance.  
+
+```{r, echo=FALSE, warning= FALSE, message= FALSE}
+pvals <- data.frame(
+  Factor = c("format", "music", "format:music", "(1 | Text)", "(1 + music | Participant)"),
+  `P-Value` = c(0.4117, 0.0112, 0.8768, 1.00, 0.7282)
+)
+
+kable(pvals, format = "latex", booktabs = TRUE,
+      caption = "Total Reading Time P-Values") %>%
+  kable_styling(latex_options = c("hold_position", "striped"))
+```
+
+
+```{r, include=FALSE, warning= FALSE, message= FALSE}
 # ANOVA for Reading Time
 model_time <- lm(total_time ~ format * music + Text + Participant + Participant:music, 
                  data = read_data)
@@ -103,9 +116,14 @@ model_time_lmer <- lmer(
   data = read_data
 )
 anova(model_time_lmer)
+
+ranova(model_time_lmer)
 ```
 
-```{r}
+
+We want to visually show what the effect of music on total reading time looks like. Displayed below is a bar plot showing the effect of music on reading time per text. We see that for all 3 text, reading time increased with music usage. 
+
+```{r, echo=FALSE, warning= FALSE, message= FALSE}
 
 # Average time per Text split by Music
 
@@ -125,14 +143,19 @@ ggplot(avg_time_text_music, aes(x = Text, y = avg_time, fill = factor(music))) +
   theme_minimal()
 ```
 
-#### Model 2: Comprehension
+### Model 2: Comprehension
 
 First we fitted a full factorial linear model including format, music, text, and participant as fixed effect to explore the overall patterns in the data. An ANOVA was created and provided no significant effect on comprehension for any main effect. 
 We believe this is due to the lack of variance in our comprehensions scores. 
 
-Again, because participants and text represent a random sample, we then fitted a mixed-effects model treating participants and text as our random effects. From this we concluded only the interaction between format and music showed statistical significant effect on comprehension with a p-value of 0.03796. No main effect significance is also evidence for us to believe there is some lack of variance in our comprehensions scores.  
+Again, because participants and text represent a random sample, we then fitted a mixed-effects model treating participants and text as our random effects. 
 
-```{r}
+# Write model here:
+
+From this we concluded only the interaction between format and music showed statistical significant effect on comprehension with a p-value of 0.03796. No main effect showed a significant effect which is evidence for us to believe there is some lack of variance in our comprehensions scores. Additionally, consistent with the time model, the random effects did not provide significant evidence of explaining additional variance. 
+
+
+```{r, include=FALSE, warning= FALSE, message= FALSE}
 # ANOVA for Comprehension
 model_comp <- lm(`Comprehension score (%)` ~ format * music + Text + 
                    Participant + Participant:music, 
@@ -147,55 +170,57 @@ model_comp_lmer <- lmer(
   data = read_data
 )
 anova(model_comp_lmer)
+ranova(model_comp_lmer)
+```
+
+```{r, echo=FALSE, warning= FALSE, message= FALSE}
+pvals2 <- data.frame(
+  Factor = c("format", "music", "format:music", "(1 | Text)", "(1 + music | Participant)"),
+  `P-Value` = c(0.60384, 0.94230, 0.03796, 1.00, 0.9272)
+)
+
+kable(pvals2, format = "latex", booktabs = TRUE,
+      caption = "Total Reading Time P-Values") %>%
+  kable_styling(latex_options = c("HOLD_position", "striped"))
 ```
 
 Since the comprehension model does not lead to very interesting analysis of results, we have decided to fit another model treating it as a fixed effect in order to determine if it had any effect on reading time. We would expect that lower comprehension score would be correlated with lower reading time. We must acknowledge however, that this is not a causal relationship but can be indicative of a relationship between these variables.
 
 From this model again we concluded no main effect was statistically significant. Although comprehension is not a statistically significant predictor, the scatter plot with a regression line indicates a negative association between comprehension score and reading time.
 
-```{r}
-model_time_lmer <- lmer(
+```{r, include=FALSE, warning= FALSE, message= FALSE}
+model_time2_lmer <- lmer(
   total_time ~ format * music * `Comprehension score (%)` + 
     (1 | Text) +
     (1 + music | Participant),
   data = read_data
 )
 
-anova(model_time_lmer)
+anova(model_time2_lmer)
+ranova(model_time2_lmer)
 ```
 
-```{r}
-# last model
-model_score_lmer <- lmer(
-  total_time ~ format * music * `Comprehension score (%)` + 
-    (1 | Text) +
-    (1 + music | Participant),
-  data = read_data
-)
-
-anova(model_score_lmer)
-
+```{r, echo=FALSE, warning= FALSE, message= FALSE}
 #correlation
 cor_val <- cor(read_data$total_time, read_data$`Comprehension score (%)`)
 
 # relationship plot
 ggplot(read_data, aes(x = total_time, y = `Comprehension score (%)`)) +
   geom_point(alpha = 0.7) +
-  geom_smooth(method = "lm", se = TRUE, color = "blue") +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
   annotate("text",
            x = Inf, y = Inf,
            label = paste("r =", round(cor_val, 3)),
            hjust = 1.1, vjust = 1.5,
            color = "blue") +
   labs(
-    title = "Relationship between Reading Time and Comprehension",
+    title = "Relationship Between Reading Time 
+and Comprehension Score ",
     x = "Reading Time (sec)",
     y = "Comprehension Score (%)"
   ) +
   theme_minimal()
 ```
-
-From this analysis, we can conclude that there was insufficient evidence to detect a significant effect on reading comprehension. However, we did find that music has an significant effect on total reading time. With more time for data collection and a larger sample size, it would be interesting to investigate whether additional factors influence these responses or whether stronger effects emerge. Overall, this model gives a great starting point for further exploration of these relationships and could lead to more interesting findings.
 
 #### Diagnostics for ANOVA
 
@@ -247,7 +272,5 @@ The mixed-effects models produced singular fit warnings, indicating that at leas
 
 Overall, diagnostics suggest that the reading time model is appropriate for inference, while the comprehension model should be interpreted more cautiously due to limited response variability.
 
-
-### Conclusions
-
-
+## Conclusions
+From this analysis, we can conclude that there was insufficient evidence to detect a significant effect on reading comprehension. However, we found that music had a significant effect on total reading time which can be important if you need to complete a reading in a specific amount of time, maybe we shouldn't be listening to music. Though, our results were not too groundbreaking, we believe that our model is a good starting point for future exploration. With more varied data, more time to collect responses, and possible adjustments to the complexity of the model it would be interesting to investigate whether additional factors influence these responses or whether stronger effects emerge. Overall, this project provided a valuable exercise in applying mixed-effects modeling to real behavioral data.
