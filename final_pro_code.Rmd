@@ -5,6 +5,7 @@ date: "Spring 2026"
 output:
   pdf_document: default
   html_document: default
+geometry: top=0.5in
 ---
 
 ```{r, include = F, echo=TRUE}
@@ -79,7 +80,6 @@ read_data$Participant <- factor(read_data$Participant)
 
 ### Model 1: Time
 
-
 First we fitted a full factorial linear model including format, music, text, and participant as fixed effect to explore the overall patterns in the data. An ANOVA was created and provided a significant main effect of music (p=0.04867), text (p=0.02744), and participants (p=0.01437). This is something we expected before analyzing. Also, we saw that no interaction effects were significant.
 
 However, because participants and text represent a random sample, we then fitted a mixed-effects model treating participants and text as our random effects. We also wanted to explore participant specific random slope for music. Changing our model to this allows for results to be generalized beyond our specific data collection.
@@ -121,7 +121,7 @@ ranova(model_time_lmer)
 
 We want to visually show what the effect of music on total reading time looks like. Displayed below is a bar plot showing the effect of music on reading time per text. We see that for all 3 text, reading time increased with music usage. 
 
-```{r, echo=FALSE, warning= FALSE, message= FALSE}
+```{r, echo=FALSE, warning= FALSE, message= FALSE, fig.width=5, fig.height=2}
 
 # Average time per Text split by Music
 
@@ -198,7 +198,7 @@ anova(model_time2_lmer)
 ranova(model_time2_lmer)
 ```
 
-```{r, echo=FALSE, warning= FALSE, message= FALSE}
+```{r, echo=FALSE, warning= FALSE, message= FALSE, fig.width=4, fig.height=2}
 #correlation
 cor_val <- cor(read_data$total_time, read_data$`Comprehension score (%)`)
 
@@ -220,29 +220,41 @@ and Comprehension Score ",
   theme_minimal()
 ```
 
-#### Diagnostics for ANOVA
+## Diagnostics
 
-```{r}
-par(mfrow = c(2,2))
-plot(model_time)
+The diagnostic analyses were conducted to evaluate whether the assumptions underlying the fitted linear and mixed-effects models were reasonably satisfied. For the reading time model, the residual versus fitted plots showed no strong systematic pattern, suggesting that the assumption of constant variance was appropriate. In addition, the Normal Q–Q plots indicated that the residuals were approximately normally distributed, with only minor deviations observed in the tails. These results suggest that the reading time model provides an adequate fit to the observed data.
 
-par(mfrow = c(2,2))
-plot(model_comp)
+For the comprehension score model, diagnostic interpretation was somewhat more limited because the response variable consisted of only a small number of discrete score levels. Although the residual plots displayed greater clustering and variability, no severe assumption violations were observed. The Q–Q plots still demonstrated approximate agreement with normality; however, the comprehension results should be interpreted more cautiously due to the restricted variability in the response.
+
+```{r, echo=FALSE, warning= FALSE, message= FALSE, fig.width=7, fig.height=2.7}
+par(mfrow = c(1,2))
+
+plot(model_time, which = 1)  
+plot(model_time, which = 2)
 
 ```
 
-## Diagnostics for mixed-effects models
+```{r, echo=FALSE, warning= FALSE, message= FALSE, fig.width=7, fig.height=2.7}
+par(mfrow = c(1,2))
 
-```{r}
-isSingular(model_time_lmer)
-isSingular(model_comp_lmer)
+plot(model_comp, which = 1) 
+plot(model_comp, which = 2)
+```
+
+Additional diagnostics were performed for the mixed-effects models. Both models produced singular-fit warnings, indicating that at least one random-effect variance component was estimated near zero. In particular, the participant-specific random slope for music contributed little additional variability beyond the random intercept structure. Despite this, the mixed-effects structure was retained because it appropriately reflected the 
+repeated-measures experimental design and accounted for participant-level grouping effects.
+
+```{r, echo=FALSE, warning= FALSE, message= FALSE, fig.width=3.3, fig.height=2.5}
+sing1 <- isSingular(model_time_lmer)
+sing2 <- isSingular(model_comp_lmer)
 
 # Residual diagnostics: reading time mixed model
 
 plot(fitted(model_time_lmer), resid(model_time_lmer),
      xlab="Fitted values",
      ylab="Residuals",
-     main="Residuals vs Fitted (Time Model)")
+     main="Residuals vs Fitted 
+     (Time Model)")
 abline(h=0,col="red")
 
 qqnorm(resid(model_time_lmer))
@@ -253,18 +265,13 @@ qqline(resid(model_time_lmer), col="red")
 plot(fitted(model_comp_lmer), resid(model_comp_lmer),
      xlab="Fitted values",
      ylab="Residuals",
-     main="Residuals vs Fitted (Comprehension Model)")
+     main="Residuals vs Fitted 
+     (Comprehension Model)")
 abline(h=0,col="red")
 
 qqnorm(resid(model_comp_lmer))
 qqline(resid(model_comp_lmer), col="red")
 ```
-
-The diagnostic analyses were conducted to evaluate whether the assumptions underlying the fitted linear and mixed-effects models were reasonably satisfied. For the reading time model, the residual versus fitted plots showed no strong systematic pattern, suggesting that the assumption of constant variance was appropriate. In addition, the Normal Q–Q plots indicated that the residuals were approximately normally distributed, with only minor deviations observed in the tails. These results suggest that the reading time model provides an adequate fit to the observed data.
-
-For the comprehension score model, diagnostic interpretation was somewhat more limited because the response variable consisted of only a small number of discrete score levels. Although the residual plots displayed greater clustering and variability, no severe assumption violations were observed. The Q–Q plots still demonstrated approximate agreement with normality; however, the comprehension results should be interpreted more cautiously due to the restricted variability in the response.
-
-Additional diagnostics were performed for the mixed-effects models. Both models produced singular-fit warnings, indicating that at least one random-effect variance component was estimated near zero. In particular, the participant-specific random slope for music contributed little additional variability beyond the random intercept structure. Despite this, the mixed-effects structure was retained because it appropriately reflected the repeated-measures experimental design and accounted for participant-level grouping effects.
 
 Overall, the diagnostic results suggest that the reading time mixed-effects model is suitable for statistical inference, while the comprehension model remains more limited due to reduced response variability. These findings support the overall validity of the modeling approach and indicate that the primary conclusions are not driven by major violations of model assumptions.
 
