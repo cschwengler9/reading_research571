@@ -84,7 +84,7 @@ First we fitted a full factorial linear model including format, music, text, and
 
 However, because participants and text represent a random sample, we then fitted a mixed-effects model treating participants and text as our random effects. We also wanted to explore participant specific random slope for music. Changing our model to this allows for results to be generalized beyond our specific data collection.
 
-# Write model here:
+The overall model can be written as $Total_-time = \alpha + \beta_{format} + \gamma_{music} + \beta\gamma + \zeta + \eta + \epsilon$ where $\epsilon$ is random error and $\zeta$ and $\eta$ are random effects representing the text and the participant music interaction.
 
 From the ANOVA of this model, we concluded that music was the only statistically significant main effect with a p-value of  0.0112. There is no significant effect of the interaction term between format and music. Also, looking at the RANOVA p-values for our random effect factors we concluded that the random effect for text showed no evidence of variance between the 3 text. Additionally, the random effect of music by participant showed no evidence of variance between how music effects the reader. This shows that participants are fairly consistent and text does not explain much variance.  
 
@@ -148,7 +148,7 @@ We believe this is due to the lack of variance in our comprehensions scores.
 
 Again, because participants and text represent a random sample, we then fitted a mixed-effects model treating participants and text as our random effects. 
 
-# Write model here:
+This model is $Comprehension = \alpha + \beta_{format} + \gamma_{music} + \beta\gamma + \zeta + \eta + \epsilon$ where $\epsilon$ is random error and $\zeta$ and $\eta$ are random effects for text and the music participant interaction respectively.
 
 From this we concluded only the interaction between format and music showed statistical significant effect on comprehension with a p-value of 0.03796. No main effect showed a significant effect which is evidence for us to believe there is some lack of variance in our comprehensions scores. Additionally, consistent with the time model, the random effects did not provide significant evidence of explaining additional variance. 
 
